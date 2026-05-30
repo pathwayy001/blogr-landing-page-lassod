@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Blogr — Write more. Worry less. A warm, human-first publishing platform for creators who care about their words."/>
+  <title>Blogr — Write More. Worry Less.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:    #FDF6ED;
+      --sand:     #F5E6CC;
+      --amber:    #E8A24A;
+      --amber-dk: #C07828;
+      --forest:   #2D4A3E;
+      --forest-lt:#3D6355;
+      --forest-xs:#EAF2EE;
+      --rust:     #C0522B;
+      --rust-lt:  #F0EDE8;
+      --charcoal: #2B2B2B;
+      --ink:      #4A4A4A;
+      --muted:    #7A7A6A;
+      --white:    #FFFFFF;
+      --font-serif: 'Lora', Georgia, serif;
+      --font-sans:  'DM Sans', system-ui, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 32px;
+      --radius-xl: 60px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-sans); background: var(--cream); color: var(--ink); overflow-x: hidden; }
+    img, svg { display: block; max-width: 100%; }
+    a { text-decoration: none; }
+
+    /* ─── TYPOGRAPHY ─── */
+    h1, h2, h3 { font-family: var(--font-serif); }
+    h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 600; line-height: 1.15; }
+    h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); font-weight: 600; line-height: 1.25; }
+    h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.35; }
+    p  { font-size: 1rem; line-height: 1.8; color: var(--ink); }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.8rem; border-radius: 3rem;
+      font-family: var(--font-sans); font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; border: none; transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-amber { background: var(--amber); color: var(--white); }
+    .btn-amber:hover { background: var(--amber-dk); box-shadow: 0 8px 24px rgba(232,162,74,0.35); }
+    .btn-outline { background: transparent; color: var(--forest); border: 2px solid var(--forest); }
+    .btn-outline:hover { background: var(--forest); color: white; }
+    .btn-forest { background: var(--forest); color: white; }
+    .btn-forest:hover { background: var(--forest-lt); box-shadow: 0 8px 24px rgba(45,74,62,0.3); }
+    .btn-ghost-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.6); }
+    .btn-ghost-white:hover { background: rgba(255,255,255,0.15); }
+
+    /* ─── NAV ─── */
+    nav {
+      display: flex; align-items: center; gap: 2rem;
+      padding: 1.6rem 8vw;
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(253,246,237,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232,162,74,0.15);
+    }
+
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.7rem; font-weight: 600;
+      color: var(--forest);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--amber); }
+
+    .nav-links { display: flex; align-items: center; gap: 0.3rem; list-style: none; }
+    .nav-links li { position: relative; }
+    .nav-links li a {
+      color: var(--ink); font-size: 0.9rem; font-weight: 500;
+      padding: 0.5rem 0.8rem; border-radius: var(--radius-sm);
+      display: flex; align-items: center; gap: 0.3rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links li a:hover { background: var(--forest-xs); color: var(--forest); }
+
+    .nav-links li a .chev {
+      width: 8px; height: 8px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg) translate(-2px,-2px);
+      transition: transform 0.25s;
+    }
+    .nav-links li.open a .chev { transform: rotate(225deg) translate(-2px,-2px); }
+
+    .dropdown {
+      display: none; position: absolute; top: calc(100% + 0.6rem); left: 0;
+      background: white; border-radius: var(--radius-md);
+      padding: 0.6rem; min-width: 180px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+      border: 1px solid rgba(232,162,74,0.15);
+    }
+    .dropdown a {
+      display: block; color: var(--ink); font-size: 0.88rem;
+      padding: 0.55rem 0.8rem; border-radius: var(--radius-sm);
+      transition: background 0.15s, color 0.15s;
+    }
+    .dropdown a:hover { background: var(--forest-xs); color: var(--forest); }
+    .nav-links li.open .dropdown { display: block; animation: popIn 0.18s ease; }
+    @keyframes popIn {
+      from { opacity:0; transform: translateY(-6px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    .nav-auth { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+    .nav-auth a { color: var(--forest); font-size: 0.9rem; font-weight: 500; transition: opacity 0.2s; }
+    .nav-auth a:hover { opacity: 0.7; }
+
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; background: none; border: none; margin-left: auto; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 26px; height: 2.5px;
+      background: var(--forest); border-radius: 2px; transition: all 0.3s;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: var(--forest);
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      padding: 6rem 8vw 8rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+      position: relative; overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute; right: -5%; top: -10%;
+      width: 55%; padding-bottom: 55%; border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(232,162,74,0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(232,162,74,0.18); color: var(--amber);
+      border: 1px solid rgba(232,162,74,0.3);
+      padding: 0.35rem 1rem; border-radius: 3rem;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 { color: white; margin-bottom: 1.4rem; }
+    .hero h1 em { font-style: italic; color: var(--amber); }
+    .hero > .hero-left > p { color: rgba(255,255,255,0.72); margin-bottom: 2.5rem; font-size: 1.05rem; }
+
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3rem;
+      padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .hero-stat-num {
+      font-family: var(--font-serif); font-size: 1.8rem; font-weight: 600; color: white;
+    }
+    .hero-stat-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 0.15rem; }
+
+    /* Blog preview cards in hero */
+    .hero-cards { position: relative; z-index: 2; }
+
+    .blog-card {
+      background: white; border-radius: var(--radius-md); padding: 1.4rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .blog-card + .blog-card { margin-top: 1rem; }
+
+    .blog-card-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      padding: 0.25rem 0.7rem; border-radius: 3rem; margin-bottom: 0.7rem;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .tag-amber { background: #FEF3E0; color: #A0600A; }
+    .tag-forest { background: var(--forest-xs); color: var(--forest); }
+    .tag-rust   { background: #FAE8DF; color: var(--rust); }
+
+    .blog-card h4 {
+      font-family: var(--font-serif); font-size: 1rem; font-weight: 600;
+      color: var(--charcoal); margin-bottom: 0.4rem; line-height: 1.4;
+    }
+
+    .blog-card-meta {
+      display: flex; align-items: center; gap: 0.7rem;
+      font-size: 0.78rem; color: var(--muted);
+    }
+
+    .avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .av-amber { background: var(--amber); }
+    .av-forest { background: var(--forest); }
+    .av-rust   { background: var(--rust); }
+
+    /* ─── INTRO BAND ─── */
+    .intro-band {
+      background: var(--sand);
+      padding: 5rem 8vw; text-align: center;
+    }
+
+    .intro-band p.eyebrow {
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--amber-dk); margin-bottom: 1rem;
+    }
+
+    .intro-band h2 { color: var(--forest); margin-bottom: 1rem; }
+    .intro-band > p { max-width: 580px; margin: 0 auto 3rem; color: var(--ink); }
+
+    .feature-pills {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem;
+    }
+    .pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: white; border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 3rem; padding: 0.55rem 1.2rem;
+      font-size: 0.88rem; font-weight: 500; color: var(--ink);
+      transition: all 0.2s;
+    }
+    .pill:hover { border-color: var(--amber); color: var(--amber-dk); background: #FEF9F2; }
+    .pill-icon { font-size: 1rem; }
+
+    /* ─── FEATURES GRID ─── */
+    .features-section {
+      padding: 6rem 8vw; background: var(--cream);
+    }
+
+    .features-header { margin-bottom: 4rem; }
+    .features-header .eyebrow {
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--amber-dk); margin-bottom: 0.8rem;
+    }
+    .features-header h2 { color: var(--charcoal); max-width: 480px; }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 2rem; border: 1px solid rgba(0,0,0,0.06);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+
+    .feature-card.accent-amber { border-top: 3px solid var(--amber); }
+    .feature-card.accent-forest { border-top: 3px solid var(--forest); }
+    .feature-card.accent-rust   { border-top: 3px solid var(--rust); }
+
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1.2rem;
+    }
+    .icon-amber { background: #FEF3E0; }
+    .icon-forest { background: var(--forest-xs); }
+    .icon-rust   { background: #FAE8DF; }
+
+    .feature-card h3 { color: var(--charcoal); margin-bottom: 0.6rem; font-size: 1.1rem; }
+    .feature-card p  { font-size: 0.93rem; line-height: 1.75; color: var(--muted); }
+
+    /* ─── DARK SPLIT ─── */
+    .split-section {
+      background: var(--forest);
+      border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+      margin-left: 8vw;
+      padding: 6rem 8vw 6rem 5rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+    }
+
+    .split-section h2 { color: white; margin-bottom: 1.2rem; }
+    .split-section > .split-text > p { color: rgba(255,255,255,0.68); font-size: 1rem; line-height: 1.8; }
+
+    .split-list { margin-top: 2rem; list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+    .split-list li {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      color: rgba(255,255,255,0.72); font-size: 0.93rem; line-height: 1.6;
+    }
+    .check {
+      width: 20px; height: 20px; border-radius: 50%; background: rgba(232,162,74,0.2);
+      border: 1.5px solid var(--amber); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px; color: var(--amber); font-size: 0.65rem; font-weight: 700;
+    }
+
+    /* ─── TESTIMONIAL ─── */
+    .testimonials-section {
+      padding: 7rem 8vw; background: var(--cream);
+      text-align: center;
+    }
+    .testimonials-section .eyebrow {
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--amber-dk); margin-bottom: 0.8rem;
+    }
+    .testimonials-section h2 { color: var(--charcoal); margin-bottom: 3.5rem; }
+
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    }
+
+    .testimonial-card {
+      background: white; border-radius: var(--radius-md);
+      padding: 2rem; text-align: left;
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: transform 0.25s;
+    }
+    .testimonial-card:hover { transform: translateY(-4px); }
+
+    .quote-mark { font-family: var(--font-serif); font-size: 4rem; line-height: 0.5; color: var(--sand); margin-bottom: 1rem; }
+    .testimonial-card p { font-size: 0.92rem; line-height: 1.75; color: var(--ink); font-style: italic; margin-bottom: 1.5rem; }
+
+    .testimonial-author { display: flex; align-items: center; gap: 0.8rem; }
+    .author-info .name { font-weight: 600; font-size: 0.88rem; color: var(--charcoal); }
+    .author-info .role { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      background: var(--amber);
+      border-radius: var(--radius-xl);
+      margin: 0 8vw 6rem;
+      padding: 5rem 6rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute; left: -8%; top: -40%;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      pointer-events: none;
+    }
+
+    .cta-section::after {
+      content: '';
+      position: absolute; right: 2%; bottom: -30%;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(0,0,0,0.06);
+      pointer-events: none;
+    }
+
+    .cta-section h2 { color: white; margin-bottom: 1rem; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+    .cta-section p  { color: rgba(255,255,255,0.82); max-width: 480px; margin: 0 auto 2.5rem; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 2; }
+    .btn-white { background: white; color: var(--amber-dk); }
+    .btn-white:hover { background: var(--cream); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--charcoal);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: 5rem 8vw 3rem;
+    }
+
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem;
+      margin-bottom: 4rem; padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .footer-brand .logo {
+      font-family: var(--font-serif); font-size: 1.8rem; font-weight: 600;
+      color: white; margin-bottom: 1rem;
+    }
+    .footer-brand .logo span { color: var(--amber); }
+    .footer-brand p { font-size: 0.88rem; color: rgba(255,255,255,0.45); line-height: 1.7; max-width: 260px; }
+
+    .footer-col h4 { color: white; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.4rem; letter-spacing: 0.05em; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 0.75rem; }
+    .footer-col ul li a { color: rgba(255,255,255,0.45); font-size: 0.88rem; transition: color 0.2s; }
+    .footer-col ul li a:hover { color: var(--amber); }
+
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.28); }
+    .footer-social { display: flex; gap: 0.75rem; }
+    .social-link {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.5); font-size: 0.8rem; font-weight: 700;
+      transition: background 0.2s, color 0.2s;
+    }
+    .social-link:hover { background: var(--amber); color: white; border-color: var(--amber); }
+
+    /* ─── MOBILE MENU ─── */
+    .mobile-overlay {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,0.4);
+    }
+    .mobile-panel {
+      position: absolute; top: 1rem; left: 1rem; right: 1rem;
+      background: white; border-radius: var(--radius-md);
+      padding: 1.5rem; box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+    }
+    .mobile-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .mobile-panel-header .logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 600; color: var(--forest); }
+    .mobile-panel-header .logo span { color: var(--amber); }
+    .close-x { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); }
+
+    .mob-links { list-style: none; }
+    .mob-links li { border-bottom: 1px solid #f0ebe3; }
+    .mob-links li button {
+      width: 100%; background: none; border: none;
+      padding: 0.9rem 0; font-size: 1rem; font-weight: 600;
+      color: var(--charcoal); cursor: pointer; text-align: left;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-sans);
+    }
+    .mob-dropdown { display: none; padding: 0.5rem 0 0.8rem; }
+    .mob-dropdown.open { display: block; }
+    .mob-dropdown a { display: block; color: var(--ink); font-size: 0.9rem; padding: 0.35rem 0.5rem; }
+
+    .mob-auth { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .mob-auth a { text-align: center; }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.up { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 960px) {
+      .nav-links, .nav-auth { display: none; }
+      .hamburger { display: flex; }
+
+      .hero { grid-template-columns: 1fr; padding: 4rem 6vw 5rem; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+      .hero::after { display: none; }
+      .hero-cards { display: none; }
+      .hero-stats { gap: 1.5rem; }
+
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+
+      .split-section {
+        grid-template-columns: 1fr; margin-left: 0;
+        border-radius: var(--radius-lg);
+        padding: 4rem 6vw;
+      }
+
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 580px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .cta-section { margin: 0 4vw 4rem; padding: 3.5rem 2rem; }
+      footer { padding: 4rem 6vw 2rem; }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-stats { flex-wrap: wrap; gap: 1.5rem; }
+      .intro-band { padding: 4rem 6vw; }
+      .features-section { padding: 4rem 6vw; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <span class="nav-logo">bl<span style="color:var(--amber)">o</span>gr</span>
+
+  <ul class="nav-links" id="desktopNav">
+    <li>
+      <a href="#" onclick="toggleDD(event,'dd1')">Product <span class="chev"></span></a>
+      <div class="dropdown" id="dd1">
+        <a href="#">Overview</a><a href="#">Pricing</a>
+        <a href="#">Marketplace</a><a href="#">Features</a>
+        <a href="#">Integrations</a>
+      </div>
+    </li>
+    <li>
+      <a href="#" onclick="toggleDD(event,'dd2')">Company <span class="chev"></span></a>
+      <div class="dropdown" id="dd2">
+        <a href="#">About</a><a href="#">Team</a>
+        <a href="#">Blog</a><a href="#">Careers</a>
+      </div>
+    </li>
+    <li>
+      <a href="#" onclick="toggleDD(event,'dd3')">Connect <span class="chev"></span></a>
+      <div class="dropdown" id="dd3">
+        <a href="#">Contact</a><a href="#">Newsletter</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </li>
+  </ul>
+
+  <div class="nav-auth">
+    <a href="#">Login</a>
+    <a href="#" class="btn btn-forest" style="padding:0.6rem 1.4rem;">Start Writing →</a>
+  </div>
+
+  <button class="hamburger" id="hamBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ════════ MOBILE MENU ════════ -->
+<div class="mobile-overlay" id="mobMenu">
+  <div class="mobile-panel">
+    <div class="mobile-panel-header">
+      <span class="logo">bl<span>o</span>gr</span>
+      <button class="close-x" onclick="closeMob()">✕</button>
+    </div>
+    <ul class="mob-links">
+      <li>
+        <button onclick="toggleMobDD('mdd1')">Product <span>▾</span></button>
+        <div class="mob-dropdown" id="mdd1">
+          <a href="#">Overview</a><a href="#">Pricing</a><a href="#">Marketplace</a><a href="#">Features</a>
+        </div>
+      </li>
+      <li>
+        <button onclick="toggleMobDD('mdd2')">Company <span>▾</span></button>
+        <div class="mob-dropdown" id="mdd2">
+          <a href="#">About</a><a href="#">Team</a><a href="#">Blog</a><a href="#">Careers</a>
+        </div>
+      </li>
+      <li>
+        <button onclick="toggleMobDD('mdd3')">Connect <span>▾</span></button>
+        <div class="mob-dropdown" id="mdd3">
+          <a href="#">Contact</a><a href="#">Newsletter</a><a href="#">LinkedIn</a>
+        </div>
+      </li>
+    </ul>
+    <div class="mob-auth">
+      <a href="#" class="btn btn-outline">Login</a>
+      <a href="#" class="btn btn-forest">Start Writing →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ HERO ════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">✦ Now with AI-powered drafts</div>
+    <h1>Write more.<br><em>Worry less.</em><br>Publish beautifully.</h1>
+    <p>Blogr is the platform built for people who love their craft. Whether you're a curious beginner or a seasoned storyteller — your words deserve a beautiful home.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn btn-amber">Start for free →</a>
+      <a href="#" class="btn btn-ghost-white">See how it works</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">48k+</div>
+        <div class="hero-stat-label">Active writers</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">2.1M</div>
+        <div class="hero-stat-label">Posts published</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">99.9%</div>
+        <div class="hero-stat-label">Uptime</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-cards">
+    <div class="blog-card">
+      <span class="blog-card-tag tag-amber">Travel</span>
+      <h4>Slow mornings in Lisbon: a love letter to getting lost</h4>
+      <div class="blog-card-meta">
+        <div class="avatar av-amber">MK</div>
+        <span>Maria K. · 4 min read</span>
+        <span>·</span>
+        <span>1.2k reads</span>
+      </div>
+    </div>
+    <div class="blog-card">
+      <span class="blog-card-tag tag-forest">Tech</span>
+      <h4>Why I deleted all my productivity apps and just used a notebook</h4>
+      <div class="blog-card-meta">
+        <div class="avatar av-forest">JR</div>
+        <span>James R. · 6 min read</span>
+        <span>·</span>
+        <span>3.7k reads</span>
+      </div>
+    </div>
+    <div class="blog-card" style="margin-top:1rem;">
+      <span class="blog-card-tag tag-rust">Culture</span>
+      <h4>The quiet joy of learning to cook your grandmother's recipes</h4>
+      <div class="blog-card-meta">
+        <div class="avatar av-rust">SL</div>
+        <span>Sofia L. · 5 min read</span>
+        <span>·</span>
+        <span>2.1k reads</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ INTRO BAND ════════ -->
+<section class="intro-band">
+  <p class="eyebrow reveal">Everything you need to write well</p>
+  <h2 class="reveal reveal-delay-1">Designed for the way<br>humans actually write</h2>
+  <p class="reveal reveal-delay-2">No bloated dashboards. No confusing settings. Just a clean, quiet space where your ideas can breathe and grow.</p>
+  <div class="feature-pills reveal reveal-delay-3">
+    <span class="pill"><span class="pill-icon">✍️</span> Distraction-free editor</span>
+    <span class="pill"><span class="pill-icon">📱</span> Looks great on mobile</span>
+    <span class="pill"><span class="pill-icon">🔍</span> Built-in SEO tools</span>
+    <span class="pill"><span class="pill-icon">🎨</span> Beautiful themes</span>
+    <span class="pill"><span class="pill-icon">📊</span> Reader analytics</span>
+    <span class="pill"><span class="pill-icon">🔒</span> Custom domain</span>
+    <span class="pill"><span class="pill-icon">💌</span> Email newsletters</span>
+    <span class="pill"><span class="pill-icon">🤝</span> Co-author support</span>
+  </div>
+</section>
+
+<!-- ════════ FEATURES GRID ════════ -->
+<section class="features-section">
+  <div class="features-header reveal">
+    <p class="eyebrow">Features</p>
+    <h2>Built around your creative process</h2>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card accent-amber reveal">
+      <div class="feature-icon icon-amber">✏️</div>
+      <h3>An editor that gets out of your way</h3>
+      <p>Clean, minimal, and blazing fast. The Blogr editor supports Markdown, rich text, embeds, and code — all with keyboard shortcuts you'll actually remember.</p>
+    </div>
+    <div class="feature-card accent-forest reveal reveal-delay-1">
+      <div class="feature-icon icon-forest">🌐</div>
+      <h3>Your site, your brand</h3>
+      <p>Choose from handcrafted themes, connect your own domain, and customise every detail — from typeface to accent color — with zero code required.</p>
+    </div>
+    <div class="feature-card accent-rust reveal reveal-delay-2">
+      <div class="feature-icon icon-rust">📈</div>
+      <h3>Grow your audience, organically</h3>
+      <p>Built-in SEO, social sharing previews, RSS feeds, and newsletter tools so your readers can find you — and keep coming back.</p>
+    </div>
+    <div class="feature-card accent-forest reveal">
+      <div class="feature-icon icon-forest">⚡</div>
+      <h3>Fast everywhere, always</h3>
+      <p>Posts load in under a second on any device, anywhere in the world. Our global CDN handles the heavy lifting so you can focus on writing.</p>
+    </div>
+    <div class="feature-card accent-rust reveal reveal-delay-1">
+      <div class="feature-icon icon-rust">🤝</div>
+      <h3>Collaborate with your team</h3>
+      <p>Invite editors, co-authors, and reviewers. Track changes, leave comments, and publish together — without stepping on each other's toes.</p>
+    </div>
+    <div class="feature-card accent-amber reveal reveal-delay-2">
+      <div class="feature-icon icon-amber">🔒</div>
+      <h3>You own your content, forever</h3>
+      <p>Export everything at any time. No lock-in, no surprises. Your writing belongs to you — and we mean that in every sense of the word.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ DARK SPLIT ════════ -->
+<section class="split-section">
+  <div class="split-text reveal">
+    <h2>Infrastructure that never makes you think about infrastructure</h2>
+    <p>Behind every fast, reliable post is a global network of servers quietly doing their job. With 99.9% uptime, automatic backups, and edge caching, your blog is in safe hands — day or night.</p>
+    <ul class="split-list">
+      <li><span class="check">✓</span>Daily automatic backups — never lose a word</li>
+      <li><span class="check">✓</span>Global CDN across 40+ locations worldwide</li>
+      <li><span class="check">✓</span>Free SSL certificate for every blog</li>
+      <li><span class="check">✓</span>DDoS protection built in from day one</li>
+      <li><span class="check">✓</span>99.9% uptime SLA — your blog is always live</li>
+    </ul>
+  </div>
+
+  <div class="reveal reveal-delay-2">
+    <!-- Server/network illustration -->
+    <svg viewBox="0 0 420 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer glow rings -->
+      <circle cx="210" cy="180" r="160" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="210" cy="180" r="120" fill="rgba(255,255,255,0.03)"/>
+      <circle cx="210" cy="180" r="80"  fill="rgba(255,255,255,0.04)"/>
+      <!-- Center orb -->
+      <circle cx="210" cy="180" r="38" fill="rgba(232,162,74,0.15)" stroke="rgba(232,162,74,0.4)" stroke-width="1.5"/>
+      <circle cx="210" cy="180" r="24" fill="rgba(232,162,74,0.2)"/>
+      <text x="210" y="186" text-anchor="middle" font-size="14" font-weight="700" fill="#E8A24A" font-family="DM Sans,sans-serif">CDN</text>
+      <!-- Node dots and lines -->
+      <!-- Top -->
+      <line x1="210" y1="142" x2="210" y2="90" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="210" cy="76" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="210" y="81" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">Tokyo</text>
+      <!-- Right -->
+      <line x1="246" y1="163" x2="308" y2="120" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="322" cy="111" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="322" y="116" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">NYC</text>
+      <!-- Bottom-right -->
+      <line x1="244" y1="198" x2="302" y2="256" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="316" cy="268" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="316" y="273" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">Sydney</text>
+      <!-- Bottom -->
+      <line x1="210" y1="218" x2="210" y2="270" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="210" cy="284" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="210" y="289" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">Lagos</text>
+      <!-- Bottom-left -->
+      <line x1="176" y1="198" x2="118" y2="256" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="104" cy="268" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="104" y="273" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">London</text>
+      <!-- Left -->
+      <line x1="174" y1="163" x2="112" y2="120" stroke="rgba(232,162,74,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <circle cx="98" cy="111" r="18" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="98" y="116" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.7)" font-family="DM Sans,sans-serif">Berlin</text>
+      <!-- Pulse dots -->
+      <circle cx="210" cy="76" r="4" fill="#E8A24A" opacity="0.9">
+        <animate attributeName="r" values="4;8;4" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="322" cy="111" r="4" fill="#E8A24A" opacity="0.9">
+        <animate attributeName="r" values="4;8;4" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="316" cy="268" r="4" fill="#E8A24A" opacity="0.9">
+        <animate attributeName="r" values="4;8;4" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.9;0.1;0.9" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+</section>
+
+<!-- ════════ TESTIMONIALS ════════ -->
+<section class="testimonials-section">
+  <p class="eyebrow reveal">Loved by writers</p>
+  <h2 class="reveal reveal-delay-1">Real words from real people</h2>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="quote-mark">"</div>
+      <p>I've tried every blogging platform out there. Blogr is the first one that felt like it was made for someone who actually cares about writing — not just publishing.</p>
+      <div class="testimonial-author">
+        <div class="avatar av-forest" style="width:38px;height:38px;font-size:0.8rem;">AO</div>
+        <div class="author-info">
+          <div class="name">Adaeze Okafor</div>
+          <div class="role">Food & Culture Writer, Lagos</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="quote-mark">"</div>
+      <p>Switched from a clunky CMS three months ago and haven't looked back. The editor is pure joy and my readers tell me the pages load so much faster now.</p>
+      <div class="testimonial-author">
+        <div class="avatar av-amber" style="width:38px;height:38px;font-size:0.8rem;">TW</div>
+        <div class="author-info">
+          <div class="name">Tom Wallis</div>
+          <div class="role">Tech blogger, London</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="quote-mark">"</div>
+      <p>As someone with no coding background, I was nervous. But I had my blog live with a custom domain in under 20 minutes. Genuinely could not believe it.</p>
+      <div class="testimonial-author">
+        <div class="avatar av-rust" style="width:38px;height:38px;font-size:0.8rem;">MP</div>
+        <div class="author-info">
+          <div class="name">Mia Petrov</div>
+          <div class="role">Lifestyle creator, Berlin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CTA ════════ -->
+<section class="cta-section reveal">
+  <h2>Your first post is waiting to be written</h2>
+  <p>Join 48,000 writers who chose a platform that respects their craft. Free forever on the starter plan — no credit card needed.</p>
+  <div class="cta-btns">
+    <a href="#" class="btn btn-white">Start writing — it's free</a>
+    <a href="#" class="btn btn-ghost-white">Read the docs</a>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">bl<span>o</span>gr</div>
+      <p>A publishing platform built for people who love what they write. Beautiful by default, powerful when you need it.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#">Overview</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Marketplace</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Integrations</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About us</a></li>
+        <li><a href="#">Team</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Newsletter</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Twitter / X</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Blogr. Made with care for writers everywhere.</p>
+    <div class="footer-social">
+      <a class="social-link" href="#">𝕏</a>
+      <a class="social-link" href="#">in</a>
+      <a class="social-link" href="#">gh</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── Desktop dropdowns ── */
+  function toggleDD(e, id) {
+    e.preventDefault();
+    const li = e.currentTarget.parentElement;
+    const open = li.classList.contains('open');
+    document.querySelectorAll('#desktopNav > li').forEach(l => l.classList.remove('open'));
+    if (!open) li.classList.add('open');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#desktopNav')) {
+      document.querySelectorAll('#desktopNav > li').forEach(l => l.classList.remove('open'));
+    }
+  });
+
+  /* ── Mobile menu ── */
+  const mobMenu = document.getElementById('mobMenu');
+  document.getElementById('hamBtn').addEventListener('click', () => {
+    mobMenu.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  });
+  function closeMob() {
+    mobMenu.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  mobMenu.querySelector('.mobile-overlay') && mobMenu.addEventListener('click', e => {
+    if (e.target === mobMenu) closeMob();
+  });
+  function toggleMobDD(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  /* ── Scroll reveal ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('up'); obs.unobserve(en.target); } });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
